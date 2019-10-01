@@ -78,6 +78,8 @@ def network_split(in_shp, out_shp, split_distance):
 
 
 def main():
+
+    ##CONFIGURATION
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
@@ -87,13 +89,19 @@ def main():
     projectName = config.get('Section', 'projectname')
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
-    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
-                                      "GIS", projectName)
     DEM_name = config.get('Section', 'dem_name')
     #DEM_name = "DEM"
+
+    geofloodResultsDir = os.path.join(geofloodHomeDir, projectName)
     Name_path = os.path.join(geofloodResultsDir, DEM_name)
+
+    #INPUT
     in_shp = Name_path+ "_channelNetwork.shp"
+
+    ##OUTPUT
     out_shp = Name_path+ "_channelSegment.shp"
+
+    ##EXECUTION
     split_distance = 1700
     network_split(in_shp, out_shp, split_distance)
 

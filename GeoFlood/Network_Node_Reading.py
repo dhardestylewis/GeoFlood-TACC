@@ -46,6 +46,8 @@ def network_node_reading(in_shp, node_csv):
 
 
 def main():
+
+    ##CONFIGURATION
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
@@ -57,13 +59,17 @@ def main():
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
     #DEM_name = "DEM"
-    geofloodInputDir = os.path.join(geofloodHomeDir, "Inputs",
-                                    "GIS", projectName) 
-    flowline_shp = os.path.join(geofloodInputDir, "Flowline.shp")
-    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
-                                      "GIS", projectName)
-    Name_path = os.path.join(geofloodResultsDir, DEM_name)
+
+    geofloodDir = os.path.join(geofloodHomeDir, projectName)
+    Name_path = os.path.join(geofloodDir, DEM_name)
+
+    ##INPUT
+    flowline_shp = os.path.join(geofloodDir, "Flowline.shp")
+
+    ##OUTPUT
     node_csv = Name_path + '_endPoints.csv'
+
+    ##EXECUTION
     network_node_reading(flowline_shp, node_csv)
 
 

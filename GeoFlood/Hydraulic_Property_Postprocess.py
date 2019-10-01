@@ -5,6 +5,8 @@ import inspect
 
 
 def main():
+
+    ##CONFIGURATION
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
@@ -14,19 +16,21 @@ def main():
     projectName = config.get('Section', 'projectname')
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
-    Name_path = os.path.join(geofloodHomeDir, "Outputs",
-                             "Hydraulics", projectName)
-    hydropropotxt = os.path.join(Name_path, "hydroprop-basetable.csv")
-    manning_n = os.path.join(geofloodHomeDir, "Inputs",
-                             "Hydraulics", projectName,
-                             "COMID_Roughness.csv") 
-    handpropotxt = os.path.join(Name_path, "hydroprop-fulltable.csv")
-    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
-                                      "GIS", projectName)
     DEM_name = config.get('Section', 'dem_name')
     #DEM_name = "DEM"
+
+    geofloodResultsDir = os.path.join(geofloodHomeDir, projectName)
     Name_path = os.path.join(geofloodResultsDir, DEM_name)
+
+    ##INPUT
+    hydropropotxt = os.path.join(geofloodResultsDir, "hydroprop-basetable.csv")
+    manning_n = os.path.join(geofloodResultsDir, "COMID_Roughness.csv") 
     networkmaptxt = Name_path + "_networkMapping.csv"
+
+    ##OUTPUT
+    handpropotxt = os.path.join(geofloodResultsDir, "hydroprop-fulltable.csv")
+
+    ##EXECUTION
     df_result = pd.read_csv(hydropropotxt)
     df_network = pd.read_csv(networkmaptxt)
     if manning_n.isdigit():

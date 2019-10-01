@@ -187,6 +187,8 @@ def array2raster(newRasterfn,rasterfn,array,datatype):
 
 
 def main():
+
+    ##CONFIGURATION
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
@@ -196,20 +198,26 @@ def main():
     projectName = config.get('Section', 'projectname')
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
-    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
-                                      "GIS", projectName)
     DEM_name = config.get('Section', 'dem_name')
     #DEM_name = "DEM"
+
+    geofloodResultsDir = os.path.join(geofloodHomeDir, projectName)
     Name_path = os.path.join(geofloodResultsDir, DEM_name)
+
+    ##INPUT
     flowline_csv = Name_path + '_endPoints.csv'
     curvaturefn = Name_path + '_curvature.tif'
     facfn = Name_path + '_fac.tif'
     skeletonfn = Name_path + '_skeleton.tif'
     handfn = Name_path + '_NegaHand.tif'
+
+    ##OUTPUT
     flowlinefn = Name_path + '_channelNetwork.shp'
     costsurfacefn = Name_path + '_cost.tif'
     pathfn = Name_path + '_path.tif'
     streamcell_csv = Name_path + '_streamcell.csv'
+
+    ##EXECUTION
     facArray = raster2array(facfn)
     facArray = np.log10(facArray)
     facArray = normalize(facArray)

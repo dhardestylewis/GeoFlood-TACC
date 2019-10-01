@@ -6,6 +6,8 @@ from osgeo import ogr, osr, gdal, gdal_array
 
 
 def main():
+
+    ##CONFIGURATION
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
@@ -15,22 +17,31 @@ def main():
     projectName = config.get('Section', 'projectname')
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
-    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
-                                      "GIS", projectName)
     DEM_name = config.get('Section', 'dem_name')
     #DEM_name = "DEM"
+
+    geofloodResultsDir = os.path.join(geofloodHomeDir, projectName)
+    fplibrary_folder = os.path.join(geofloodHomeDir,
+                                    projectName, "InundationLibrary")
+    if not os.path.exists(fplibrary_folder):
+        os.mkdir(fplibrary_folder)
+
+    ##INPUT
     Name_path = os.path.join(geofloodResultsDir, DEM_name)
     hand_raster = Name_path+ "_hand.tif"
+    segcatchment_tif = Name_path+"_segmentCatchment.tif"
+    network_table = Name_path+"_networkMapping.csv"
+    stage_txt = os.path.join(geofloodHomeDir, projectName, "stage.txt")
+
+    ##EXECUTION
     ds = gdal.Open(hand_raster)
     srs = osr.SpatialReference(wkt = ds.GetProjection())
     band = ds.GetRasterBand(1)
     hand_arr = band.ReadAsArray()
     nodata = band.GetNoDataValue()
-    segcatchment_tif = Name_path+"_segmentCatchment.tif"
     segcat_ds = gdal.Open(segcatchment_tif)
     segcat_band = segcat_ds.GetRasterBand(1)
     segcat_arr = segcat_band.ReadAsArray()
-    network_table = Name_path+"_networkMapping.csv"
     hydroids = np.loadtxt(network_table, dtype=int, skiprows = 1,
                           delimiter=',', usecols=(0,))
 ##    segcatchment_shp = Name_path+ "_segmentCatchment.shp"
@@ -39,23 +50,26 @@ def main():
 ##    srsfile = open(segcatchment_shp[:-4]+".prj", 'w')
 ##    srsfile.write(srs.ExportToWkt())
 ##    srsfile.close()
-    stage_txt = os.path.join(geofloodHomeDir, "Inputs",
-                             "Hydraulics", projectName,
-                             "stage.txt")
     stages = np.loadtxt(stage_txt, skiprows = 1)
-    fplibrary_folder = os.path.join(geofloodHomeDir, "Outputs",
-                                    "InundationLibrary", projectName)
-    if not os.path.exists(fplibrary_folder):
-        os.mkdir(fplibrary_folder)
+
     Name_path = os.path.join(fplibrary_folder, DEM_name)
+
+    ##EXECUTION
     driver = ogr.GetDriverByName("ESRI Shapefile")
+
     for i in range(len(stages)):
+
+        ##EXECUTION
         stage = stages[i]
         data = np.where((hand_arr<=stage) & (hand_arr >= 0),1,0)
+
+        ##OUTPUT 
         fp_raster = Name_path+"_fpzone"+str(i)+".tif"
+        fp_vector = Name_path+"_fpzone"+str(i) + ".shp"
+
+        ##EXECUTION
         gdal_array.SaveArray(data.astype("int8"),
                              fp_raster, "GTIFF", ds)
-        fp_vector = Name_path+"_fpzone"+str(i) + ".shp"
         dst_ds = driver.CreateDataSource(fp_vector)
         dst_layer = dst_ds.CreateLayer(fp_vector, srs)
         tmpds = gdal.Open(fp_raster)
@@ -64,11 +78,14 @@ def main():
         gdal.Polygonize(tmpband, tmpband, dst_layer, -1, ["8CONNECTED"],
                         callback=None)
         dst_ds.Destroy()
+
     for hydroid in hydroids:
+
         catch_fplibrary_folder = os.path.join(fplibrary_folder,
                                               "Catchment_"+str(hydroid))
         if not os.path.exists(catch_fplibrary_folder):
             os.mkdir(catch_fplibrary_folder)
+
         for i in range(len(stages)):
             stage = stages[i]
             catch_stage_fp_tif = os.path.join(catch_fplibrary_folder,

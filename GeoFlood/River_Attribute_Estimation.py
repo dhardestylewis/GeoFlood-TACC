@@ -75,6 +75,8 @@ def river_attribute_estimation(segment_shp, segcatfn,
 
 
 def main():
+
+    ##CONFIGURATION
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
@@ -84,31 +86,36 @@ def main():
     projectName = config.get('Section', 'projectname')
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
-    burn_option = 0
-    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
-                                      "GIS", projectName)
     DEM_name = config.get('Section', 'dem_name')
     #DEM_name = "DEM"
+    burn_option = 0
+    burn_option = config.get('Section', 'burn_option')
+
+    geofloodResultsDir = os.path.join(geofloodHomeDir, projectName)
+    if not os.path.exists(geofloodResultsDir):
+        os.mkdir(geofloodResultsDir)
     Name_path = os.path.join(geofloodResultsDir, DEM_name)
+
+    ##INPUT
     segment_shp = Name_path + "_channelSegment.shp"
     segcatfn = Name_path + "_segmentCatchment.tif"
+
+    ##OUTPUT
     segcat_shp = Name_path + "_segmentCatchment.shp"
-    hydro_folder = os.path.join(geofloodHomeDir,
-                                "Outputs", "Hydraulics",
-                                projectName)
-    if not os.path.exists(hydro_folder):
-        os.mkdir(hydro_folder)
-    attribute_txt = os.path.join(hydro_folder,
+    attribute_txt = os.path.join(geofloodResultsDir,
                                  DEM_name+"_River_Attribute.txt")
-    burn_option = config.get('Section', 'burn_option')
+
     if burn_option == 1:
+        ##INPUT
         burndemfn = Name_path + "_fdc.tif"
+        ##EXECUTION
         river_attribute_estimation(segment_shp, segcatfn,
                                    segcat_shp, burndemfn,
                                    attribute_txt)
     else:
-        demfn = os.path.join(geofloodHomeDir, "Inputs",
-                             "GIS", projectName, DEM_name+".tif")
+        ##INPUT
+        demfn = os.path.join(geofloodHomeDir, projectName, DEM_name+".tif")
+        ##EXECUTION
         river_attribute_estimation(segment_shp, segcatfn,
                                    segcat_shp, demfn,
                                    attribute_txt)

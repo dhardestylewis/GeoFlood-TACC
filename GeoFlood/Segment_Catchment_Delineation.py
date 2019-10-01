@@ -50,12 +50,16 @@ def grass_controller(geofloodHomeDir):
 
 
 def main():
+
+    ##CONFIGURATION
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
             inspect.stack()[0][1])),
                              'GeoFlood.cfg'))
     geofloodHomeDir = config.get('Section', 'geofloodhomedir')
+
+    ##EXECUTION
     grass_controller(geofloodHomeDir)
 
 if __name__ == '__main__':

@@ -29,6 +29,8 @@ def network_mapping(cat_shp, seg_shp, map_csv):
 
 
 def main():
+
+    ##CONFIGURATION
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
@@ -40,14 +42,19 @@ def main():
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
     #DEM_name = "DEM"
-    geofloodInputDir = os.path.join(geofloodHomeDir, "Inputs",
+
+    geofloodDir = os.path.join(geofloodHomeDir, "Inputs",
                                     "GIS", projectName) 
-    cat_shp = os.path.join(geofloodInputDir, "Catchment.shp")
-    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
-                                      "GIS", projectName)
-    Name_path = os.path.join(geofloodResultsDir, DEM_name)
+    Name_path = os.path.join(geofloodDir, DEM_name)
+
+    ##INPUT
+    cat_shp = os.path.join(geofloodDir, "Catchment.shp")
     seg_shp = Name_path + "_channelSegment.shp"
+
+    ##OUTPUT
     map_csv = Name_path + "_networkMapping.csv"
+
+    ##EXECUTION
     network_mapping(cat_shp, seg_shp, map_csv)
 
 
