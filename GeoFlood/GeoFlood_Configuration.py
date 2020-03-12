@@ -6,8 +6,7 @@ import inspect
 
 config = ConfigParser.RawConfigParser()
 config.add_section('Section')
-geofloodHomeDir = str(sys.argv[1])
-config.set('Section', 'geofloodHomeDir', geofloodHomeDir)
+config.set('Section', 'geofloodHomeDir', str(sys.argv[1]))
 #config.set('Section', 'geofloodHomeDir', "H:\GeoFlood")
 config.set('Section', 'projectName', str(sys.argv[2]))
 #config.set('Section', 'projectName', "Test_Stream")

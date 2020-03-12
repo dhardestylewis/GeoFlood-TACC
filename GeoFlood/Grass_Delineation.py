@@ -1,9 +1,10 @@
+from __future__ import division
 import os
 import sys
 import shutil
 import subprocess
-from time import clock
-import ConfigParser
+from time import perf_counter 
+import configparser
 import inspect
 import grass.script as g
 import grass.script.setup as gsetup
@@ -11,11 +12,11 @@ import grass.script.setup as gsetup
 
 def segment_catchment_delineation(fdrfn, segshp, segcatfn):
     grass7bin = 'grass74'
-    # grass7bin = 'grass72'
+    # grass7bin = 'grass76'
     if sys.platform.startswith('win'):
         # MS Windows
         # grass7bin = r'C:\Program Files\GRASS GIS 7.2.1\grass72.bat'
-        grass7bin = r'C:\Program Files (x86)\GRASS GIS 7.4.0\grass74.bat'
+        grass7bin = r'C:\Program Files\GRASS GIS 7.6\grass76.bat'
         # uncomment when using standalone WinGRASS installer
         # grass7bin = r'C:\Program Files (x86)\GRASS GIS 7.2.0\grass72.bat'
         # this can be avoided if GRASS executable is added to PATH
@@ -28,8 +29,8 @@ def segment_catchment_delineation(fdrfn, segshp, segcatfn):
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     if p.returncode != 0:
-        print >>sys.stderr, "ERROR: Cannot find GRASS GIS 7 " \
-              "start script (%s)" % startcmd
+        print("ERROR: Cannot find GRASS GIS 7 " \
+              "start script (%s)" % startcmd, file=sys.stderr)
         sys.exit(-1)
     gisbase = out.strip('\n\r')
     gisdb = os.path.join(os.path.expanduser("~"), "grassdata")
@@ -41,20 +42,20 @@ def segment_catchment_delineation(fdrfn, segshp, segcatfn):
     locationGeonet = 'geonet'
     grassGISlocation = os.path.join(gisdbdir, locationGeonet)
     if os.path.exists(grassGISlocation):
-        print "Cleaning existing Grass location"
+        print("Cleaning existing Grass location")
         shutil.rmtree(grassGISlocation)
     gsetup.init(gisbase, gisdbdir, locationGeonet, 'PERMANENT')
     mapsetGeonet = 'geonetuser'
-    print 'Making the geonet location'
+    print('Making the geonet location')
     g.run_command('g.proj', georef=fdrfn, location = locationGeonet)
     location = locationGeonet 
     mapset = mapsetGeonet
-    print 'Existing Mapsets after making locations:'
+    print('Existing Mapsets after making locations:')
     g.read_command('g.mapsets', flags = 'l')
-    print 'Setting GRASSGIS environ'
+    print('Setting GRASSGIS environ')
     gsetup.init(gisbase, gisdbdir, locationGeonet, 'PERMANENT')
     ##    g.gisenv()
-    print 'Making mapset now'
+    print('Making mapset now')
     g.run_command('g.mapset', flags = 'c', mapset = mapsetGeonet,\
                   location = locationGeonet, dbase = gisdbdir)
     # gsetup initialization 
@@ -79,7 +80,7 @@ def segment_catchment_delineation(fdrfn, segshp, segcatfn):
 
 
 def main():
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
             inspect.stack()[0][1])),

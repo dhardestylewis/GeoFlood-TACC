@@ -1,9 +1,12 @@
+import sys
+from __future__ import division
 import os
 import math
 from osgeo import ogr
 import gdal, osr
-import ConfigParser
+import configparser
 import inspect
+from time import perf_counter 
 
 
 def _distance(a, b):
@@ -78,9 +81,7 @@ def network_split(in_shp, out_shp, split_distance):
 
 
 def main():
-
-    ##CONFIGURATION
-    config = ConfigParser.RawConfigParser()
+    config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
             inspect.stack()[0][1])),
@@ -89,22 +90,20 @@ def main():
     projectName = config.get('Section', 'projectname')
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
+    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
+                                      "GIS", projectName)
     DEM_name = config.get('Section', 'dem_name')
     #DEM_name = "DEM"
-
-    geofloodResultsDir = os.path.join(geofloodHomeDir, projectName)
     Name_path = os.path.join(geofloodResultsDir, DEM_name)
-
-    #INPUT
     in_shp = Name_path+ "_channelNetwork.shp"
-
-    ##OUTPUT
     out_shp = Name_path+ "_channelSegment.shp"
-
-    ##EXECUTION
     split_distance = 1700
     network_split(in_shp, out_shp, split_distance)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    t0 = perf_counter()
     main()
+    t1 = perf_counter()
+    print(("time taken to segment streamline:", t1-t0, " seconds"))
+    sys.exit(0)

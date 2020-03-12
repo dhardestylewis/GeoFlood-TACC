@@ -1,9 +1,12 @@
+import sys
+from __future__ import division
 import os
 import numpy as np
 from scipy import stats
 from osgeo import gdal,ogr
-import ConfigParser
+import configparser
 import inspect
+from time import perf_counter 
 
 
 def river_attribute_estimation(segment_shp, segcatfn,
@@ -61,6 +64,9 @@ def river_attribute_estimation(segment_shp, segcatfn,
         m_array = np.cumsum(m_array)
         z_array = rasterBand.ReadAsArray()[py, px].flatten()
         slope = -stats.linregress(m_array, z_array)[0]
+        print(feat_id)
+        print(m_array)
+        print(z_array)
         cat_layer.SetAttributeFilter("HYDROID = "+str(feat_id))
         area = 0
         for feat in cat_layer:
@@ -75,9 +81,7 @@ def river_attribute_estimation(segment_shp, segcatfn,
 
 
 def main():
-
-    ##CONFIGURATION
-    config = ConfigParser.RawConfigParser()
+    config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
             inspect.stack()[0][1])),
@@ -86,40 +90,39 @@ def main():
     projectName = config.get('Section', 'projectname')
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
+    burn_option = 0
+    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
+                                      "GIS", projectName)
     DEM_name = config.get('Section', 'dem_name')
     #DEM_name = "DEM"
-    burn_option = 0
-    burn_option = config.get('Section', 'burn_option')
-
-    geofloodResultsDir = os.path.join(geofloodHomeDir, projectName)
-    if not os.path.exists(geofloodResultsDir):
-        os.mkdir(geofloodResultsDir)
     Name_path = os.path.join(geofloodResultsDir, DEM_name)
-
-    ##INPUT
     segment_shp = Name_path + "_channelSegment.shp"
     segcatfn = Name_path + "_segmentCatchment.tif"
-
-    ##OUTPUT
     segcat_shp = Name_path + "_segmentCatchment.shp"
-    attribute_txt = os.path.join(geofloodResultsDir,
+    hydro_folder = os.path.join(geofloodHomeDir,
+                                "Outputs", "Hydraulics",
+                                projectName)
+    if not os.path.exists(hydro_folder):
+        os.mkdir(hydro_folder)
+    attribute_txt = os.path.join(hydro_folder,
                                  DEM_name+"_River_Attribute.txt")
-
+    burn_option = config.get('Section', 'burn_option')
     if burn_option == 1:
-        ##INPUT
         burndemfn = Name_path + "_fdc.tif"
-        ##EXECUTION
         river_attribute_estimation(segment_shp, segcatfn,
                                    segcat_shp, burndemfn,
                                    attribute_txt)
     else:
-        ##INPUT
-        demfn = os.path.join(geofloodHomeDir, projectName, DEM_name+".tif")
-        ##EXECUTION
+        demfn = os.path.join(geofloodHomeDir, "Inputs",
+                             "GIS", projectName, DEM_name+".tif")
         river_attribute_estimation(segment_shp, segcatfn,
                                    segcat_shp, demfn,
                                    attribute_txt)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    t0 = perf_counter()
     main()
+    t1 = perf_counter()
+    print(("time taken to estimate river attributes:", t1-t0, " seconds"))
+    sys.exit(0)

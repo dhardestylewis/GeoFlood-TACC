@@ -35,8 +35,6 @@ def array2raster(newRasterfn,rasterfn,array,datatype,NoData_value):
 
 
 def main():
-
-    ##CONFIGURATION
     config = ConfigParser.RawConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
@@ -47,18 +45,14 @@ def main():
     DEM_name = config.get('Section', 'dem_name')
     #geofloodHomeDir = "H:\GeoFlood"
     #DEM_name = "DEM"
-
-    geofloodDir = os.path.join(geofloodHomeDir, projectName)
-    Name_path = os.path.join(geofloodDir, DEM_name)
-
-    ##INPUT
-    demfn = os.path.join(geofloodDir, DEM_name+".tif")
+    geofloodInputDir = os.path.join(geofloodHomeDir, "Inputs",
+                                    "GIS", projectName)
+    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
+                                      "GIS", projectName)
+    demfn = os.path.join(geofloodInputDir, DEM_name+".tif")
+    Name_path = os.path.join(geofloodResultsDir, DEM_name)
     pathfn = Name_path + '_path.tif'
-
-    ##OUTPUT
     burnpathfn = Name_path + '_burn.tif'
-
-    ##EXECUTION
     demArray = raster2array(demfn)
     pathArray = raster2array(pathfn)
     raster = gdal.Open(demfn)
@@ -73,3 +67,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+                
+
+    
+        
+        

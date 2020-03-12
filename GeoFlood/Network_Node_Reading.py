@@ -1,8 +1,11 @@
+from __future__ import division
+import sys
 from osgeo import ogr
 import os
 import pandas as pd
-import ConfigParser
+import configparser
 import inspect
+from time import perf_counter 
 
 
 def network_node_reading(in_shp, node_csv):
@@ -36,7 +39,7 @@ def network_node_reading(in_shp, node_csv):
         if to_node_list[i] not in from_node_list:
             end_x_list = [last_point_list[i][0]]*len(start_x_list)
             end_y_list = [last_point_list[i][1]]*len(start_x_list)
-    df = pd.DataFrame({"RiverID": range(1, len(start_x_list)+1),
+    df = pd.DataFrame({"RiverID": list(range(1, len(start_x_list)+1)),
                        "START_X": start_x_list,
                        "START_Y": start_y_list,
                        "END_X": end_x_list,
@@ -46,9 +49,7 @@ def network_node_reading(in_shp, node_csv):
 
 
 def main():
-
-    ##CONFIGURATION
-    config = ConfigParser.RawConfigParser()
+    config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
             inspect.stack()[0][1])),
@@ -56,22 +57,19 @@ def main():
     geofloodHomeDir = config.get('Section', 'geofloodhomedir')
     projectName = config.get('Section', 'projectname')
     DEM_name = config.get('Section', 'dem_name')
-    #geofloodHomeDir = "H:\GeoFlood"
-    #projectName = "Test_Stream"
-    #DEM_name = "DEM"
-
-    geofloodDir = os.path.join(geofloodHomeDir, projectName)
-    Name_path = os.path.join(geofloodDir, DEM_name)
-
-    ##INPUT
-    flowline_shp = os.path.join(geofloodDir, "Flowline.shp")
-
-    ##OUTPUT
+    geofloodInputDir = os.path.join(geofloodHomeDir, "Inputs",
+                                    "GIS", projectName) 
+    flowline_shp = os.path.join(geofloodInputDir, "Flowline.shp")
+    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
+                                      "GIS", projectName)
+    Name_path = os.path.join(geofloodResultsDir, DEM_name)
     node_csv = Name_path + '_endPoints.csv'
-
-    ##EXECUTION
     network_node_reading(flowline_shp, node_csv)
 
 
 if __name__ == '__main__':
+    t0 = perf_counter()
     main()
+    t1 = perf_counter()
+    print(("time taken to detect end points:", t1-t0, " seconds"))
+    sys.exit(0)

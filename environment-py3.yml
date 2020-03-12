@@ -1,0 +1,18 @@
+name: geoflood-py3
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - scipy
+  - statsmodels
+  - numpy
+  - python=3.8
+  - configparser
+  - scikit-fmm
+  - pandas
+  - scikit-image
+  - netcdf4
+  - gdal
+  - matplotlib
+prefix: /home/dhl/anaconda3/envs/geoflood-py3
+

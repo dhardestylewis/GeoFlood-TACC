@@ -1,0 +1,11 @@
+name: geoflood-py2
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=2.7
+  - gdal
+  - configparser
+  - numpy
+prefix: /home/dhl/anaconda3/envs/geoflood-py2
+

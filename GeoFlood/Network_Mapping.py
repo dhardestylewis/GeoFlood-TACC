@@ -1,9 +1,13 @@
+import sys
+from __future__ import division
 import os
 import pandas as pd
 from osgeo import ogr
 import gdal, osr
-import ConfigParser
+import configparser
 import inspect
+from time import perf_counter 
+
 
 
 def network_mapping(cat_shp, seg_shp, map_csv):
@@ -29,9 +33,7 @@ def network_mapping(cat_shp, seg_shp, map_csv):
 
 
 def main():
-
-    ##CONFIGURATION
-    config = ConfigParser.RawConfigParser()
+    config = configparser.ConfigParser()
     config.read(os.path.join(os.path.dirname(
         os.path.dirname(
             inspect.stack()[0][1])),
@@ -42,21 +44,20 @@ def main():
     #geofloodHomeDir = "H:\GeoFlood"
     #projectName = "Test_Stream"
     #DEM_name = "DEM"
-
-    geofloodDir = os.path.join(geofloodHomeDir, "Inputs",
+    geofloodInputDir = os.path.join(geofloodHomeDir, "Inputs",
                                     "GIS", projectName) 
-    Name_path = os.path.join(geofloodDir, DEM_name)
-
-    ##INPUT
-    cat_shp = os.path.join(geofloodDir, "Catchment.shp")
+    cat_shp = os.path.join(geofloodInputDir, "Catchment.shp")
+    geofloodResultsDir = os.path.join(geofloodHomeDir, "Outputs",
+                                      "GIS", projectName)
+    Name_path = os.path.join(geofloodResultsDir, DEM_name)
     seg_shp = Name_path + "_channelSegment.shp"
-
-    ##OUTPUT
     map_csv = Name_path + "_networkMapping.csv"
-
-    ##EXECUTION
     network_mapping(cat_shp, seg_shp, map_csv)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    t0 = perf_counter()
     main()
+    t1 = perf_counter()
+    print(("time taken to map network:", t1-t0, " seconds"))
+    sys.exit(0)
